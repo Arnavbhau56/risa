@@ -63,7 +63,7 @@ Do not use tables anywhere. Ensure clarity, academic rigor, and depth of analysi
     }
     
     try {
-      const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY!);
+      const genAI = new GoogleGenerativeAI('AIzaSyDlvKgyQ9YtaMUvLX-pVEIN6jdMdRgWMHs');
       const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
       
       const selectedItemsData = items.filter(item => selectedItems.includes(item.id));

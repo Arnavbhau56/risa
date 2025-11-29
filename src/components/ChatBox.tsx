@@ -114,7 +114,7 @@ export const ChatBox = React.forwardRef<any, ChatBoxProps>(({ items, onAddMessag
     // Send to Gemini API
     setTimeout(async () => {
       try {
-        const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY!);
+        const genAI = new GoogleGenerativeAI('AIzaSyDlvKgyQ9YtaMUvLX-pVEIN6jdMdRgWMHs');
         const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
         
         const prompt = `${input}\n\nCRITICAL INSTRUCTION: Never create tables, comparison tables, structured tables, or any tabular format. Do not use pipe symbols (|), dashes for table headers, or any table-like structure. For comparisons, assessments, or any structured content, use only:\n- Bullet points\n- Numbered lists\n- Paragraph format\n- Headings with text below\n\nAbsolutely no table formatting allowed.`;
