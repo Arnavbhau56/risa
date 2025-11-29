@@ -117,7 +117,8 @@ export const ChatBox = React.forwardRef<any, ChatBoxProps>(({ items, onAddMessag
         const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY!);
         const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
         
-        const result = await model.generateContent(input);
+        const prompt = `${input}\n\nCRITICAL INSTRUCTION: Never create tables, comparison tables, structured tables, or any tabular format. Do not use pipe symbols (|), dashes for table headers, or any table-like structure. For comparisons, assessments, or any structured content, use only:\n- Bullet points\n- Numbered lists\n- Paragraph format\n- Headings with text below\n\nAbsolutely no table formatting allowed.`;
+        const result = await model.generateContent(prompt);
         const response = result.response.text();
         
         const botMessage: Message = {
@@ -181,26 +182,27 @@ export const ChatBox = React.forwardRef<any, ChatBoxProps>(({ items, onAddMessag
                     <div 
                       className={`text-sm prose prose-sm max-w-none break-words select-text cursor-text ${
                         message.type === 'user' 
-                          ? 'text-white [&_*]:text-white' 
-                          : 'text-white [&_*]:text-white [&_p]:text-white [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white [&_h4]:text-white [&_h5]:text-white [&_h6]:text-white [&_strong]:text-white [&_em]:text-white [&_code]:text-white [&_pre]:text-white [&_li]:text-white [&_ul]:text-white [&_ol]:text-white [&_blockquote]:text-white [&_a]:text-white'
+                          ? 'text-white [&_*]:text-white [&_strong]:!bg-yellow-300 [&_strong]:!text-black [&_strong]:px-1 [&_strong]:py-0.5 [&_strong]:rounded [&_strong]:font-normal' 
+                          : 'text-white [&_*]:text-white [&_p]:text-white [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white [&_h4]:text-white [&_h5]:text-white [&_h6]:text-white [&_strong]:!bg-yellow-300 [&_strong]:!text-black [&_strong]:px-1 [&_strong]:py-0.5 [&_strong]:rounded [&_strong]:font-normal [&_em]:text-white [&_code]:text-white [&_pre]:text-white [&_li]:text-white [&_ul]:text-white [&_ol]:text-white [&_blockquote]:text-white [&_a]:text-white [&_table]:!border-collapse [&_table]:!border [&_table]:!border-gray-400 [&_table]:!w-full [&_th]:!border [&_th]:!border-gray-400 [&_th]:!px-2 [&_th]:!py-1 [&_th]:!bg-gray-700 [&_th]:!text-white [&_th]:!font-bold [&_td]:!border [&_td]:!border-gray-400 [&_td]:!px-2 [&_td]:!py-1 [&_td]:!text-white'
                       }`}
                       onMouseUp={() => handleTextSelection(message.id)}
                     >
-                      {highlights[message.id] && highlights[message.id].length > 0 ? (
-                        <div 
-                          className="prose prose-sm max-w-none [&_mark]:bg-yellow-300 [&_mark]:!text-black [&_mark]:px-1 [&_mark]:py-0.5 [&_mark]:rounded [&_mark]:font-medium [&_mark]:shadow-sm"
-                          dangerouslySetInnerHTML={{ 
-                            __html: highlightText(message.content, message.id) 
-                          }} 
-                        />
-                      ) : (
-                        <ReactMarkdown 
-                          remarkPlugins={[remarkMath]} 
-                          rehypePlugins={[rehypeKatex]}
-                        >
-                          {message.content}
-                        </ReactMarkdown>
-                      )}
+                      <ReactMarkdown 
+                        remarkPlugins={[remarkMath]} 
+                        rehypePlugins={[rehypeKatex]}
+                      >
+                        {(() => {
+                          const messageHighlights = highlights[message.id] || [];
+                          if (messageHighlights.length === 0) return message.content;
+                          
+                          let highlightedContent = message.content;
+                          messageHighlights.forEach(highlight => {
+                            const regex = new RegExp(`(${highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                            highlightedContent = highlightedContent.replace(regex, '**$1**');
+                          });
+                          return highlightedContent;
+                        })()}
+                      </ReactMarkdown>
                     </div>
                   </div>
                   {message.type === 'user' && (

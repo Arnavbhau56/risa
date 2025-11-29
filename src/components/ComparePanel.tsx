@@ -38,9 +38,12 @@ I. Introduction: Framing the Comparison
 
 II. Comparative Analysis (Thesis, Findings, Methodology)
 
-III. Assessment of Strengths and Weaknesses (Structured Table)
+III. Assessment of Strengths and Weaknesses (Do not use table, give bulleted points)
 
-IV. Synthesis and Scholarly Reconciliation/Judgment`;
+IV. Synthesis and Scholarly Reconciliation/Judgment
+
+
+Do not use tables anywhere. Ensure clarity, academic rigor, and depth of analysis throughout your response.`;
 
   const handleCompare = async () => {
     if (isLoading) return;
